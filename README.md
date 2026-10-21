@@ -64,6 +64,11 @@
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
+- [Privacy notes](docs/PRIVACY.md)
+- [Security policy](SECURITY.md)
+- [Support](SUPPORT.md)
+- [Third-party notices](THIRD_PARTY_NOTICES.md)
+- [Changelog](CHANGELOG.md)
 
 ## How it works
 
@@ -206,7 +211,7 @@ The recognition pipeline uses the model and runtime bundled with the extension a
 - **Accuracy:** Recognition can be incorrect. Check the result before submitting.
 - **Responsible use:** CAPTCHA is an anti-automation control. Use this project only where authorized by the institution and the website's applicable policies.
 
-For a production release, review diagnostic output and remove sensitive recognition text from logs when it is not required.
+For more detail, see the [privacy notes](docs/PRIVACY.md) and [security policy](SECURITY.md). For a production release, review diagnostic output and remove sensitive recognition text from logs when it is not required.
 
 ## Troubleshooting
 
@@ -262,7 +267,7 @@ This is a browser extension rather than a conventional Node.js application. No p
 
 ## Contributing
 
-Contributions that improve reliability, maintainability, and transparency are welcome.
+Contributions that improve reliability, maintainability, and transparency are welcome. Read the [contribution guidelines](CONTRIBUTING.md) before opening a pull request. Community participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md); use the [issue templates](.github/ISSUE_TEMPLATE/) for bug reports and feature requests.
 
 Potential areas for improvement:
 
@@ -283,7 +288,7 @@ Keep changes focused, test them against the intended environment, and document n
 
 ## License
 
-No `LICENSE` file was present when this README was prepared. Until a license is added, do not assume the source code or bundled model may be redistributed under an open-source license.
+The repository's [LICENSE](LICENSE) file currently states that **no project open-source license has been granted**. Do not assume that public availability on GitHub grants permission to use, modify, or redistribute the source code. Bundled third-party libraries and model assets may have separate terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
