@@ -7,7 +7,7 @@ Thank you for considering a contribution to KLU ERP Auto-Fill. Contributions sho
 1. Read the [README](README.md), especially **Privacy and security** and **Responsible use**.
 2. Check open issues and pull requests for related work.
 3. For a substantial change, open an issue or discussion first so the proposed approach can be agreed before implementation.
-4. Do not assume that the project has an open-source license. See [LICENSE](LICENSE) before redistributing or reusing code or bundled assets.
+4. Review [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) before reusing or redistributing code and bundled assets. Apache-2.0 applies only to material the project maintainer is authorized to license; third-party materials may have separate terms.
 
 ## Scope and responsible use
 
