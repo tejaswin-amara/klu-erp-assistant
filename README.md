@@ -1,80 +1,92 @@
-<div align="center">KLU ERP Auto-Fill
+<!--
+  KLU ERP Auto-Fill
+  Documentation for the Chrome Manifest V3 extension.
+-->
 
-A local-first Chrome extension for the KL University ERP login page.
+<div align="center">
 
-Automatically recognize and fill the CAPTCHA verification field using a bundled CRNN model powered by ONNX Runtime Web and WebAssembly.
+# KLU ERP Auto-Fill
 
-""Chrome Extension" (https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)" (https://developer.chrome.com/docs/extensions/)
-""Manifest V3" (https://img.shields.io/badge/Manifest-V3-34A853?style=for-the-badge&logo=googlechrome&logoColor=white)" (https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
-""JavaScript" (https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111111)" (https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-""ONNX Runtime" (https://img.shields.io/badge/Inference-ONNX_Runtime-7B61FF?style=for-the-badge)" (https://onnxruntime.ai/docs/tutorials/web/)
+**A local-first Chrome extension for the KL University ERP login page.**
 
-"View Repository" (https://github.com/tejaswin-amara/klu-erp-autofill) · "Open KLU ERP" (https://newerp.kluniversity.in/)
+Recognizes the CAPTCHA image with a bundled CRNN model and fills the verification field using ONNX Runtime Web and WebAssembly.
 
-</div>---
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/)
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-34A853?style=for-the-badge&logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
+[![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111111)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![ONNX Runtime Web](https://img.shields.io/badge/Inference-ONNX_Runtime-7B61FF?style=for-the-badge)](https://onnxruntime.ai/docs/tutorials/web/)
 
-Overview
+[**View Repository**](https://github.com/tejaswin-amara/klu-erp-autofill) · [**Open KLU ERP**](https://newerp.kluniversity.in/)
 
-KLU ERP Auto-Fill is a lightweight Chrome extension designed to reduce repetitive manual CAPTCHA entry on the KL University ERP login page.
+</div>
 
-It uses a locally bundled CRNN (Convolutional Recurrent Neural Network) text-recognition model to process the CAPTCHA image in the browser, infer the character sequence, and populate the matching verification field.
+---
 
-Unlike implementations that depend on a separate cloud OCR service, this extension uses ONNX Runtime Web with WebAssembly (WASM) for model inference directly in the browser.
+## Overview
 
-The extension targets the KLU ERP website specifically and uses Chrome's Manifest V3 architecture.
+KLU ERP Auto-Fill is a Chrome extension designed to reduce repetitive manual CAPTCHA entry on the KL University ERP login page.
 
-Features
+It uses a bundled **Convolutional Recurrent Neural Network (CRNN)** in ONNX format. The extension processes the CAPTCHA image in the browser, decodes the model output into a character sequence, and places the recognized text in the verification field.
 
-Feature| Description
-Automatic field filling| Detects the CAPTCHA image and corresponding input field and fills the recognized text.
-Local model inference| Runs the bundled ONNX model through ONNX Runtime Web and WebAssembly.
-CAPTCHA refresh detection| Observes changes to the CAPTCHA image's "src" attribute and attempts recognition again.
-No extension popup required| Runs through a content script on the configured ERP website.
-Focused website scope| The manifest restricts content-script injection to the specified KLU ERP domain.
-Native input events| Dispatches "input" and "change" events after setting the verification field.
-Bundled runtime assets| Includes the model and inference runtime files needed for local execution.
+The inference pipeline uses **ONNX Runtime Web** and **WebAssembly (WASM)** rather than a separate cloud OCR service.
 
-«Note: The extension fills the verification field. It does not automatically submit the login form, authenticate an account, or guarantee successful CAPTCHA recognition.»
+> **Important:** This extension fills the verification field only. It does not submit the login form, authenticate an account, or guarantee correct CAPTCHA recognition. Verify the result before continuing.
 
-How It Works
+## Features
 
+| Feature | Description |
+| --- | --- |
+| CAPTCHA recognition | Runs the bundled CRNN model against the detected CAPTCHA image. |
+| Automatic field filling | Places the recognized sequence in the verification input. |
+| Local inference | Uses ONNX Runtime Web and bundled WebAssembly assets. |
+| Refresh detection | Observes CAPTCHA image source changes and attempts recognition again. |
+| Manifest V3 | Uses Chrome's current extension manifest format. |
+| Focused website scope | Content-script injection is configured for the KLU ERP hostname. |
+| Input events | Dispatches `input` and `change` events after updating the field. |
+
+## How It Works
+
+```mermaid
 flowchart TD
     A["KLU ERP Login Page"] --> B["Detect CAPTCHA Image and Input"]
-    B --> C["Load Bundled CRNN Model"]
-    C --> D["Convert Image to Input Tensor"]
+    B --> C["Load CRNN Model and Metadata"]
+    C --> D["Preprocess CAPTCHA Image"]
     D --> E["ONNX Runtime Web"]
     E --> F["WebAssembly Inference"]
     F --> G["CTC Greedy Decoding"]
-    G --> H["Populate Verification Field"]
+    G --> H["Fill Verification Field"]
     H --> I["Dispatch Input and Change Events"]
     J["CAPTCHA Image Refresh"] --> K["MutationObserver"]
     K --> B
+```
 
-Processing Pipeline
+### Processing pipeline
 
-1. Page detection: The content script looks for supported CAPTCHA image and verification-input selectors.
-2. Model initialization: The extension loads the model metadata and initializes an ONNX Runtime inference session.
-3. Image preprocessing: The CAPTCHA image is drawn onto a canvas and converted into the tensor format expected by the model.
-4. Inference: The CRNN model processes the tensor using the WebAssembly execution provider.
-5. Text decoding: The output logits are decoded into a character sequence using greedy CTC-style decoding.
-6. Field population: The recognized text is assigned to the verification input, followed by native "input" and "change" events.
-7. Refresh handling: A "MutationObserver" watches for changes to the CAPTCHA image's source and triggers another recognition attempt.
+1. **Detect page elements:** The content script looks for the CAPTCHA image and its corresponding verification input.
+2. **Initialize inference:** It loads the model metadata and initializes an ONNX Runtime inference session.
+3. **Preprocess the image:** The CAPTCHA image is drawn to a canvas and converted into the tensor format expected by the model.
+4. **Run inference:** The CRNN model processes the tensor through the WebAssembly execution provider.
+5. **Decode the output:** Greedy CTC-style decoding converts the model output into a character sequence.
+6. **Fill the field:** The recognized text is assigned to the verification input, followed by native `input` and `change` events.
+7. **Handle refreshes:** A `MutationObserver` watches the CAPTCHA image's `src` attribute and can trigger another recognition attempt.
 
-The implementation also limits its initial search attempts to avoid retrying indefinitely when the expected page elements cannot be found.
+The implementation also limits its initial element-search attempts so it does not retry indefinitely when expected page elements are absent.
 
-Technology Stack
+## Technology Stack
 
-Component| Technology| Purpose
-Extension platform| Chrome Manifest V3| Defines the extension and its execution scope.
-Core implementation| JavaScript| Handles page detection, inference orchestration, and input updates.
-Machine learning model| CRNN, ONNX format| Recognizes CAPTCHA character sequences.
-Inference runtime| ONNX Runtime Web| Executes the model within the browser.
-Compute backend| WebAssembly (WASM)| Provides local inference execution.
-Output decoding| CTC greedy decoding| Converts model logits into a character sequence.
-Page observation| MutationObserver| Detects CAPTCHA image-source changes.
+| Component | Technology | Role |
+| --- | --- | --- |
+| Extension platform | Chrome Manifest V3 | Defines extension metadata, scripts, and resources |
+| Core logic | JavaScript | Page detection and inference orchestration |
+| Recognition model | CRNN / ONNX | Predicts CAPTCHA character sequences |
+| Inference runtime | ONNX Runtime Web | Executes the model in the browser |
+| Compute backend | WebAssembly | Runs inference locally |
+| Output decoding | CTC greedy decoding | Converts model output into text |
+| Page observation | `MutationObserver` | Detects CAPTCHA image-source changes |
 
-Project Structure
+## Project Structure
 
+```text
 klu-erp-autofill/
 ├── manifest.json
 ├── content.js
@@ -89,161 +101,178 @@ klu-erp-autofill/
     ├── icon16.png
     ├── icon48.png
     └── icon128.png
+```
 
-Path| Description
-"manifest.json"| Extension metadata, content-script configuration, and resource declarations.
-"content.js"| CAPTCHA detection, model inference, decoding, and input filling.
-"model/crnn.onnx"| Bundled CRNN recognition model.
-"model/crnn.json"| Model metadata, including input dimensions and recognition alphabet.
-"lib/ort.min.js"| ONNX Runtime Web JavaScript runtime.
-"lib/ort-wasm-simd.wasm"| SIMD-enabled WebAssembly runtime asset.
-"lib/ort-wasm.wasm"| Standard WebAssembly runtime asset.
-"icons/"| Chrome extension icons in supported sizes.
+| Path | Purpose |
+| --- | --- |
+| `manifest.json` | Extension metadata, content-script configuration, and resource declarations |
+| `content.js` | CAPTCHA detection, preprocessing, inference, decoding, and field filling |
+| `model/crnn.onnx` | Bundled CRNN recognition model |
+| `model/crnn.json` | Model metadata, including input dimensions and recognition alphabet |
+| `lib/ort.min.js` | ONNX Runtime Web JavaScript runtime |
+| `lib/ort-wasm-simd.wasm` | SIMD-enabled WebAssembly runtime |
+| `lib/ort-wasm.wasm` | Standard WebAssembly runtime |
+| `icons/` | Extension icons in supported sizes |
 
-Installation
+## Installation
 
-Load the extension locally using Chrome's Developer Mode.
+The extension can be loaded locally in Chrome using Developer mode.
 
-1. Download the Repository
+### 1. Get the repository
 
 Clone the repository:
 
+```bash
 git clone https://github.com/tejaswin-amara/klu-erp-autofill.git
 cd klu-erp-autofill
+```
 
-Alternatively, select Code → Download ZIP on GitHub and extract the archive.
+Alternatively, use **Code → Download ZIP** on GitHub and extract the archive.
 
-2. Open Chrome Extensions
+### 2. Open Chrome Extensions
 
 Navigate to:
 
+```text
 chrome://extensions
+```
 
-Enable Developer mode using the toggle in the upper-right corner.
+Enable **Developer mode**.
 
-3. Load the Extension
+### 3. Load the extension
 
-1. Click Load unpacked.
-2. Select the "klu-erp-autofill" directory containing "manifest.json".
-3. Verify that the extension appears in the extensions list without an error.
+1. Click **Load unpacked**.
+2. Select the project directory containing `manifest.json`.
+3. Confirm that Chrome lists the extension without an error.
 
-Keep the project directory intact. The model, runtime, WebAssembly files, and icons are referenced using paths within the extension.
+Keep the project directory intact: the model, runtime, WebAssembly files, and icons are loaded from paths inside it.
 
-4. Test on the ERP Page
+### 4. Test on KLU ERP
 
-Open the official "KL University ERP login page" (https://newerp.kluniversity.in/).
+1. Open the [KLU ERP login page](https://newerp.kluniversity.in/).
+2. Ensure the extension is enabled.
+3. Reload the ERP tab.
+4. Check whether the verification field is populated.
+5. Verify the recognized text before submitting the form.
 
-With the extension enabled, reload the page and check whether the verification field is populated.
+Use the university login system only in accordance with applicable institutional rules and authorization requirements.
 
-Use the login system only in accordance with your institution's rules and authorization requirements.
+## Configuration and Compatibility
 
-Configuration and Compatibility
+| Setting | Current implementation |
+| --- | --- |
+| Target URL | `https://newerp.kluniversity.in/*` |
+| Extension format | Chrome Manifest V3 |
+| Model | `model/crnn.onnx` |
+| Metadata | `model/crnn.json` |
+| Model input dimensions | `120 × 50`, as specified in metadata |
+| Inference runtime | ONNX Runtime Web |
+| Execution backend | WebAssembly |
+| Refresh detection | Watches the CAPTCHA image's `src` attribute |
 
-The extension is designed specifically for the configured ERP website rather than as a general-purpose CAPTCHA reader.
+The model metadata defines the recognition alphabet and CTC blank index. Changes to the ERP page structure, CAPTCHA appearance, model format, or preprocessing requirements may require corresponding code or model updates.
 
-Configuration| Current implementation
-Target website| "https://newerp.kluniversity.in/*"
-Extension format| Chrome Manifest V3
-Model file| "model/crnn.onnx"
-Model metadata| "model/crnn.json"
-Input dimensions| "120 × 50", as specified in the metadata
-Runtime| ONNX Runtime Web
-Execution provider| WebAssembly
-CAPTCHA refresh handling| Watches the image's "src" attribute
+## Privacy and Security
 
-The model metadata defines the recognition alphabet and CTC blank index. Changes to the ERP page's DOM, CAPTCHA format, or model assets may require corresponding changes to the extension.
+The recognition pipeline uses the model and runtime files bundled with the extension. It does not require a separate remote OCR backend. This does **not** mean the ERP website itself operates offline: normal website requests still go to the website's servers.
 
-Privacy and Security
+Keep the following points in mind:
 
-The extension uses bundled model and runtime assets for its recognition pipeline. Its declared content-script scope is limited to the configured KLU ERP hostname and does not require a separate remote OCR backend.
+- **Console output:** The current content script logs debug information, including recognized CAPTCHA text. Do not share unredacted browser-console logs or screenshots containing verification codes.
+- **Credentials:** The extension is intended to fill the verification field, not to collect or manage account credentials. Review the source before installing or distributing modified versions.
+- **Permissions and scope:** Review `manifest.json` before changing the domains on which the content script can execute.
+- **Recognition limitations:** Results can be incorrect. Check the field before submitting the login form.
+- **Responsible use:** CAPTCHA challenges are anti-automation controls. Use this extension only where permitted by the institution and applicable website policies.
 
-Important considerations:
+For a production release, review diagnostic logging and remove sensitive recognition output where it is not needed.
 
-- Local inference: CAPTCHA recognition runs in the browser using the bundled ONNX model and WebAssembly runtime.
-- Website communication: Loading and using the ERP website still involves the website's own network communication. Local model inference does not make the entire login process offline.
-- Console output: The current content script writes debug messages to the browser console, including the recognized CAPTCHA text. Avoid sharing unredacted console logs or screenshots containing verification codes.
-- Credentials: The extension's purpose is verification-field filling, not password collection or credential management. Review the source code before installing or distributing a modified build.
-- Permissions and scope: Review "manifest.json" before changing the URLs on which the content script can execute.
-
-For production distribution, consider removing sensitive recognition output from debug logs and reviewing the extension's behavior and permissions before publishing a release.
-
-Troubleshooting
+## Troubleshooting
 
 <details>
-<summary><strong>The verification field is not populated</strong></summary>- Confirm that you are on "https://newerp.kluniversity.in/".
-- Make sure the extension is enabled.
-- Reload the ERP tab after enabling or reloading the extension.
-- Check that the model and runtime assets exist in their expected directories.
-- Open Chrome DevTools and inspect the Console for messages beginning with "[KLU-Captcha]".
-- Confirm that the ERP page's CAPTCHA image and input selectors still match those used in "content.js".
+<summary><strong>The verification field is not populated</strong></summary>
 
-</details><details>
-<summary><strong>The extension reports a model or WASM loading error</strong></summary>- Verify that "model/crnn.onnx" and "model/crnn.json" exist.
-- Verify that the files under "lib/" have not been renamed or removed.
-- Recheck the resource paths declared in "manifest.json".
-- Use an up-to-date Chrome or Chromium-based browser and inspect the reported console error.
+- Confirm that the current page is [KLU ERP](https://newerp.kluniversity.in/).
+- Confirm that the extension is enabled.
+- Reload the extension from `chrome://extensions`, then reload the ERP tab.
+- Check that the model and runtime files are present in their expected directories.
+- Inspect Chrome DevTools Console for messages prefixed with `[KLU-Captcha]`.
+- Check whether the page's current CAPTCHA image and input elements match the selectors in `content.js`.
 
-</details><details>
-<summary><strong>The field is filled with incorrect text</strong></summary>Recognition accuracy is not guaranteed. The result depends on the CAPTCHA image, the model's capabilities, and compatibility between the page image and model preprocessing.
+</details>
 
-Verify the text before submitting the form. If recognition fails, use the site's normal verification process.
+<details>
+<summary><strong>The model or WebAssembly runtime fails to load</strong></summary>
 
-</details><details>
-<summary><strong>Changes to the source are not taking effect</strong></summary>1. Save your changes.
-2. Open "chrome://extensions".
-3. Reload the extension.
+- Verify that `model/crnn.onnx` and `model/crnn.json` exist.
+- Verify that the files in `lib/` have not been renamed or removed.
+- Check the resource paths declared in `manifest.json`.
+- Use an up-to-date Chrome or Chromium-based browser and inspect the exact console error.
+
+</details>
+
+<details>
+<summary><strong>The field contains incorrect text</strong></summary>
+
+Recognition is not guaranteed. Accuracy depends on the CAPTCHA image, model capabilities, and compatibility between the page image and model preprocessing.
+
+Verify the result before submitting. If recognition fails, use the site's normal verification process.
+
+</details>
+
+<details>
+<summary><strong>Source changes are not appearing</strong></summary>
+
+1. Save the modified files.
+2. Open `chrome://extensions`.
+3. Click **Reload** on the extension.
 4. Reload the ERP tab.
 
-Chrome may continue using the previously loaded version until both the extension and the affected page are refreshed.
+</details>
 
-</details>Development
+## Development
 
-To make changes locally:
+To work on the extension locally:
 
 1. Clone the repository.
-2. Inspect "manifest.json" for extension configuration and target URL scope.
-3. Inspect "content.js" for CAPTCHA detection, preprocessing, inference, decoding, and field updates.
-4. Keep the model metadata consistent with the model's expected input and output.
-5. Reload the extension and ERP tab after source changes.
-6. Test model loading, missing-element behavior, recognition failures, and CAPTCHA refresh handling.
+2. Review `manifest.json` for extension configuration and URL scope.
+3. Review `content.js` for element detection, preprocessing, inference, decoding, and input updates.
+4. Keep model metadata aligned with the model's expected input and output.
+5. Reload the extension and ERP tab after code changes.
+6. Test model loading, missing page elements, recognition failures, and CAPTCHA refresh behavior.
 
-This repository is a browser extension rather than a conventional Node.js application. A package manager or build command should not be assumed unless one is added to the project.
+This repository is a browser extension rather than a conventional Node.js application. Do not assume a package manager or build command is required unless one is added to the project.
 
-Responsible Use
+## Contributing
 
-This project is intended for authorized, policy-compliant use on the configured university ERP website.
+Contributions that improve reliability, maintainability, accessibility, and transparency are welcome.
 
-CAPTCHA challenges are security and anti-automation controls. Use automation only when permitted by the institution and the website's applicable policies. Do not use this project to evade access restrictions, automate unauthorized account access, or interfere with university systems.
+Useful areas for improvement include:
 
-Contributing
-
-Contributions are welcome when they improve reliability, maintainability, and transparency.
-
-Potential areas for improvement include:
-
-- More robust detection of supported page elements.
+- More resilient detection of page elements.
 - Clearer error handling and diagnostics.
 - Removal of sensitive information from debug output.
-- Better compatibility checks for the inference model and input format.
-- Documentation improvements and reproducible testing instructions.
+- Compatibility checks for model inputs and outputs.
+- Reproducible tests and improved documentation.
 
 Keep changes focused, test them against the intended environment, and document any new dependencies or permissions.
 
-Author
+## Author
 
-Tejaswin Amara
+**Tejaswin Amara**
 
-- GitHub: "@tejaswin-amara" (https://github.com/tejaswin-amara)
-- Repository: "klu-erp-autofill" (https://github.com/tejaswin-amara/klu-erp-autofill)
+- GitHub: [@tejaswin-amara](https://github.com/tejaswin-amara)
+- Repository: [klu-erp-autofill](https://github.com/tejaswin-amara/klu-erp-autofill)
 
-License
+## License
 
-No "LICENSE" file was found in the repository when this README was prepared. Unless a license is added, do not assume that the code or bundled model can be redistributed under an open-source license.
+No `LICENSE` file was present when this README was prepared. Unless a license is added, do not assume the source code or bundled model may be redistributed under an open-source license.
 
 ---
 
-<div align="center">Built with JavaScript, ONNX Runtime Web, and WebAssembly.
+<div align="center">
 
-"Back to Top" (#klu-erp-auto-fill)
+Built with JavaScript, ONNX Runtime Web, and WebAssembly.
+
+[Back to top](#klu-erp-auto-fill)
 
 </div>
