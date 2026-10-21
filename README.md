@@ -1,74 +1,49 @@
-# KLU ERP Manual CAPTCHA Assistant
+<div align="center">
 
-**Version:** 2.0.0 · **Manifest:** Chrome Manifest V3 · **Runtime dependencies:** none
+# 🚀 KLU ERP Captcha Auto-Fill
 
-This extension provides user-controlled visual magnification and navigation assistance for the CAPTCHA shown on the configured KLU ERP page. It does **not** recognize, infer, solve, populate, or submit CAPTCHA answers. The user must interpret the image and complete the site’s verification flow manually.
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chrome.google.com/)
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-success?style=for-the-badge&logo=codeforces&logoColor=white)](https://developer.chrome.com/docs/extensions/mv3/)
+[![100% On-Device](https://img.shields.io/badge/Privacy-100%25%20On%20Device-orange?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/tejaswin-amara/klu-erp-assistant)
+[![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)]()
 
-## Verified target origin
+*A lightning-fast, zero-click, on-device CAPTCHA recognition assistant built exclusively for the KL University ERP portal.*
 
-The supplied original archive's `manifest.json` specifies `https://newerp.kluniversity.in/*`. The rebuilt extension is configured to that exact HTTPS origin. It does not run on arbitrary websites and does not request `<all_urls>` access.
+</div>
 
-## Features
+---
 
-- Magnifies the visible CAPTCHA image at 1×, 1.5×, 2×, 2.5×, or 3×.
-- Offers standard, high-contrast, and grayscale visual filters.
-- Uses a visible status message if the image is missing, unreadable by the browser, or the page is unsupported.
-- Can move focus to the human-entry field without reading or modifying its value.
-- Can click a recognized visible CAPTCHA refresh control only after the user presses the corresponding extension button; a cooldown prevents rapid repeated clicks.
-- Stores only display preferences in `chrome.storage.local`.
-- Makes no extension-initiated network requests, and includes no OCR/ML model or WASM runtime.
+## ✨ Overview
 
-## Safety and privacy
+**KLU ERP Captcha Auto-Fill** is a lightweight, high-performance Google Chrome extension designed to streamline the sign-in process for KL University students. It automatically detects, processes, and fills out the verification code challenge on the [KL University ERP login page](https://newerp.kluniversity.in/) the exact millisecond the page loads.
 
-The extension removes the original package’s ONNX Runtime Web files and the `model/crnn.onnx` model. It does not make network requests, inspect passwords, access cookies or session tokens, retain CAPTCHA answers, populate the answer field, or submit the login form. For magnification, the content script attempts to rasterize the already displayed image into an in-memory data URL. If browser origin protections prevent that operation, it fails safely and instructs the user to inspect the image directly on the ERP page; it does not circumvent those protections.
+Unlike traditional cloud-based bypass tools, this extension operates **entirely offline and locally inside your browser** using an optimized CRNN ONNX neural network model running via WebAssembly (`onnxruntime-web`).
 
-Permissions are limited to `storage` and `activeTab`. The content script match is an exact configured HTTPS host. The service worker is intentionally omitted. The popup’s content security policy disables connections and remote executable code.
+---
 
-## Install the extension
+## 🌟 Key Features
 
-1. Install Node.js 20 or newer only if you need to run the project's tests or package scripts. A built extension can be loaded directly.
-2. Extract `klu-erp-assistant-v2.0.0.zip` into a local folder.
-3. Open `chrome://extensions` in Chrome and enable **Developer mode**.
-4. Select **Load unpacked** and choose the extracted folder containing `manifest.json`.
-5. Open `https://newerp.kluniversity.in/`, then open the extension popup.
-6. Inspect the magnified image and enter the answer yourself on the ERP page. The extension does not submit the form.
+- **⚡ Zero-Click Automation:** No popups to open, no buttons to click—the verification box populates automatically upon page load.
+- **🔄 Dynamic Refresh Handling:** Automatically re-solves and updates the code if the CAPTCHA image is refreshed or reloaded.
+- **🔒 100% On-Device Processing:** Runs completely local. No external servers, no cloud OCR APIs, and no telemetry.
+- **🛡️ Extreme Privacy:** Zero tracking, zero logging, and zero credential exposure. Your session tokens and data never leave your browser.
+- **📦 Clean Manifest V3 Architecture:** Built to modern Chrome extension security and performance standards.
 
-If the extension was installed before a package update, press **Reload** on its card in `chrome://extensions`, and reload the ERP tab.
+---
 
-## Build and verify from source
+## 🛠️ Tech Stack
 
-From the project root, with Node.js 20+:
+- **Core:** Vanilla JavaScript (ES Modules)
+- **Engine:** ONNX Runtime Web (`onnxruntime-web` + WASM)
+- **Model:** CRNN Neural Network Model (`.onnx`) tailored for text recognition
+- **Extension Standard:** Google Chrome Manifest V3
 
-```sh
-npm test
-npm run verify:security
-npm run benchmark
-npm run release
-```
+---
 
-`npm run release` runs the unit/integration suite, source-level safety checks, a synthetic in-process microbenchmark, and deterministic ZIP/checksum packaging followed by a fresh-extraction validation. These checks do not replace an interactive test in Chrome.
+## 📥 Installation & Setup (Developer Mode)
 
-### Configure a different ERP origin
+To run or test this extension locally in Google Chrome:
 
-Only do this if the ERP portal hostname has been independently verified and you are authorized to use the extension there. Supply an exact HTTPS origin, with no path or wildcard:
-
-```sh
-npm run set-domain -- https://erp.example.edu
-npm run release
-```
-
-The script updates both the manifest match and runtime origin configuration. Chrome must be reloaded after rebuilding. Do not broaden the match pattern to all websites.
-
-## Troubleshooting
-
-- **Unsupported page:** Check that the address bar uses the configured HTTPS origin. Hostnames and subdomains must match exactly.
-- **No CAPTCHA detected:** The page’s element identifiers may differ from the selectors supported by this version. The extension does not inspect unrelated form fields; use the ERP page normally and update the selector list only after review.
-- **Image cannot be magnified:** The browser may block canvas export for a cross-origin image. Inspect the existing image directly on the page. The extension intentionally does not bypass browser origin protections.
-- **Extension cannot message the page:** Reload the extension and the ERP tab. Chrome must inject the content script on the configured host.
-- **Refresh button unavailable:** Use the ERP page’s visible refresh control. The extension only recognizes a limited, explicit selector allowlist.
-
-## Development quality gates
-
-See `docs/testing.md`, `docs/security-and-privacy.md`, and `docs/architecture/decision-record.md`. The GitHub Actions workflow in `.github/workflows/ci.yml` runs the test suite, safety scan, synthetic benchmark, deterministic packaging, and archive validation on pushes to `main`, pull requests, and manual dispatch. It uploads the generated runtime ZIP and checksum as a workflow artifact; browser acceptance still requires a real Chrome session.
-
-`CONTRIBUTING.md` documents the security boundary and contribution checks. The source repository also includes the v2.0.0 runtime ZIP and checksum under `release/v2.0.0/`. No license grant is asserted; `LICENSE-NOTICE.txt` records that licensing remains for the project owner to decide.
+1. **Clone or Download** this repository to your local machine:
+   ```bash
+   git clone [https://github.com/tejaswin-amara/klu-erp-assistant.git](https://github.com/tejaswin-amara/klu-erp-assistant.git)
