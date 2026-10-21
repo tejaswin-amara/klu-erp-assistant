@@ -22,3 +22,8 @@ For any additional library, model, font, icon, or other third-party asset, recor
 ## Important
 
 This inventory is a documentation starting point, not a complete legal determination of every file's licensing status. Review the exact files and upstream license terms before publishing a release or redistributing bundled assets.
+
+
+## Project license scope
+
+The repository's Apache-2.0 license is intended for original project code and documentation authored for this repository by the copyright holder. It does not override separate licenses, copyright, trademark, or other rights applying to third-party components or assets. The exact provenance and licensing status of the bundled CRNN model and metadata should be confirmed before redistribution. Do not assume this notice itself grants rights to third-party materials.
