@@ -1,77 +1,39 @@
-(function startKluErpContentScript(root) {
-  'use strict';
-  if (root.__KLU_ERP_MANUAL_ASSISTANT__) return;
-  const api = root.KluErpPageAssistance;
-  const config = root.KluErpExtensionConfig;
-  if (!api || !config || !root.chrome?.runtime?.id || !root.document) return;
-  if (!api.allowedPage(root.document)) return;
+﻿async function executeAutoSolve() {
+  const captchaImg = document.querySelector('img[src*="captcha"], img[alt*="captcha"], img[id*="captcha"]');
+  const captchaInput = document.querySelector('input[type="text"][name*="captcha"], input[id*="captcha"]');
 
-  const TYPES = Object.freeze({
-    GET_PAGE_STATUS: 'GET_PAGE_STATUS',
-    FOCUS_CAPTCHA_INPUT: 'FOCUS_CAPTCHA_INPUT',
-    TRIGGER_CAPTCHA_REFRESH: 'TRIGGER_CAPTCHA_REFRESH'
-  });
-  let lastRefreshTimestamp = 0;
-  let destroyed = false;
+  if (!captchaImg || !captchaInput) return;
 
-  function validateMessage(message) {
-    if (!message || typeof message !== 'object' || Array.isArray(message) || Object.getPrototypeOf(message) !== Object.prototype) return false;
-    const schema = {
-      [TYPES.GET_PAGE_STATUS]: ['type'],
-      [TYPES.FOCUS_CAPTCHA_INPUT]: ['type'],
-      [TYPES.TRIGGER_CAPTCHA_REFRESH]: ['type']
-    }[message.type];
-    if (!schema || Object.keys(message).some((key) => !schema.includes(key))) return false;
-    return true;
+  const canvas = document.createElement('canvas');
+  canvas.width = captchaImg.width || captchaImg.naturalWidth;
+  canvas.height = captchaImg.height || captchaImg.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(captchaImg, 0, 0);
+  const base64Image = canvas.toDataURL('image/jpeg');
+
+  const formData = new FormData();
+  formData.append('base64Image', base64Image);
+  formData.append('apikey', 'helloworld'); // Public test key
+  formData.append('isOverlayRequired', 'false');
+  formData.append('scale', 'true');
+  formData.append('OCREngine', '2');
+
+  try {
+    const response = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: formData });
+    const data = await response.json();
+
+    if (data.IsErroredOnProcessing || !data.ParsedResults || data.ParsedResults.length === 0) return;
+
+    const solvedText = data.ParsedResults[0].ParsedText.replace(/\s/g, '').trim();
+    if (!solvedText) return;
+
+    captchaInput.value = solvedText;
+    captchaInput.dispatchEvent(new Event('input', { bubbles: true }));
+    captchaInput.dispatchEvent(new Event('change', { bubbles: true }));
+  } catch (e) {
+    console.error("OCR Fetch failed", e);
   }
+}
 
-  function onMessage(message, sender, sendResponse) {
-    if (destroyed) return false;
-    if (sender?.id !== root.chrome.runtime.id) {
-      sendResponse({ ok: false, error: 'Untrusted sender rejected.' });
-      return false;
-    }
-    if (!validateMessage(message)) {
-      sendResponse({ ok: false, error: 'Invalid or unsupported message.' });
-      return false;
-    }
-    if (!api.allowedPage(root.document)) {
-      sendResponse({ ok: false, state: api.STATUS.UNSUPPORTED_PAGE, message: 'The active page is not supported.' });
-      return false;
-    }
-
-    switch (message.type) {
-      case TYPES.GET_PAGE_STATUS:
-        sendResponse({ ok: true, ...api.inspectPage(root.document) });
-        break;
-      case TYPES.FOCUS_CAPTCHA_INPUT:
-        sendResponse(api.focusCaptchaInput(root.document));
-        break;
-      case TYPES.TRIGGER_CAPTCHA_REFRESH: {
-        const result = api.triggerCaptchaRefresh(root.document, Date.now(), lastRefreshTimestamp);
-        if (result.ok) lastRefreshTimestamp = result.lastRefresh;
-        sendResponse(result);
-        break;
-      }
-      default:
-        sendResponse({ ok: false, error: 'Unsupported message type.' });
-    }
-    return false;
-  }
-
-  const listener = (message, sender, sendResponse) => onMessage(message, sender, sendResponse);
-  root.chrome.runtime.onMessage.addListener(listener);
-  root.addEventListener?.('pagehide', () => {
-    destroyed = true;
-    root.chrome.runtime.onMessage.removeListener?.(listener);
-    delete root.__KLU_ERP_MANUAL_ASSISTANT__;
-  }, { once: true });
-
-  root.__KLU_ERP_MANUAL_ASSISTANT__ = Object.freeze({
-    destroy() {
-      destroyed = true;
-      root.chrome.runtime.onMessage.removeListener?.(listener);
-      delete root.__KLU_ERP_MANUAL_ASSISTANT__;
-    }
-  });
-})(globalThis);
+// Run 800ms after page load to ensure the image has rendered
+setTimeout(executeAutoSolve, 800);
