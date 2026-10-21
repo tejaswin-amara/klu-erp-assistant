@@ -12,5 +12,3 @@ Notable project changes are documented here. Entries describe repository changes
 - Repository extension version recorded in `manifest.json`.
 - For the complete implementation details of this version, review the source and commit history.
 
-[Unreleased]: https://github.com/tejaswin-amara/klu-erp-autofill/compare/HEAD...main
-[1.0.2]: https://github.com/tejaswin-amara/klu-erp-autofill/tree/main
