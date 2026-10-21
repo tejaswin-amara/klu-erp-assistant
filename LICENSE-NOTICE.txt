@@ -1,0 +1,3 @@
+LICENSE NOTICE — PROJECT OWNER ACTION REQUIRED
+
+No conventional license grant is included in this rebuilt package. This notice is not a license and does not grant reuse, redistribution, or modification rights. The project owner should select and add an appropriate license after confirming ownership and third-party asset obligations.

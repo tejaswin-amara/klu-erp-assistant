@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "KLU ERP Manual CAPTCHA Assistant",
+  "version": "2.0.0",
+  "description": "User-controlled CAPTCHA magnification and keyboard focus assistance. Does not solve or submit CAPTCHA answers.",
+  "permissions": ["storage", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["https://newerp.kluniversity.in/*"],
+      "js": ["src/content/config.js", "src/content/page-assistance.js", "src/content/content-script.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_title": "KLU ERP Manual CAPTCHA Assistant",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'"
+  }
+}

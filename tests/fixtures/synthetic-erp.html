@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Synthetic ERP Fixture — Local Testing Only</title></head>
+<body>
+  <main>
+    <h1>Local Synthetic ERP Fixture</h1>
+    <p>This fixture is for local testing only and contains no production account or CAPTCHA answer.</p>
+    <form id="login-form">
+      <label for="loginFormCaptcha">Manual verification text</label>
+      <img id="loginFormCaptcha-image" data-erp-captcha alt="Synthetic visual challenge" width="120" height="50" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jY1kAAAAASUVORK5CYII=" />
+      <input id="loginFormCaptcha" name="LoginForm[captcha]" type="text" autocomplete="off">
+      <button id="refreshCaptcha" data-erp-captcha-refresh type="button">Refresh image</button>
+      <button type="submit">Continue (fixture only)</button>
+    </form>
+  </main>
+</body>
+</html>

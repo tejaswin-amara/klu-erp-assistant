@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Test, security, and package verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Unit and integration tests
+        run: npm test
+
+      - name: Security and CAPTCHA safety scan
+        run: npm run verify:security
+
+      - name: Synthetic local performance benchmark
+        run: npm run benchmark
+
+      - name: Build deterministic extension package
+        run: npm run package
+
+      - name: Validate packaged archive and checksum
+        run: npm run validate:package
+
+      - name: Upload extension release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: klu-erp-assistant-v2.0.0
+          path: |
+            dist/klu-erp-assistant-v2.0.0.zip
+            dist/klu-erp-assistant-v2.0.0.sha256
+          if-no-files-found: error
+          retention-days: 30
