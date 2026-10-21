@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-KLU ERP Auto-Fill includes or relies on third-party runtime components and model assets. Their terms are separate from the project's own licensing status.
+The project's original code and documentation are licensed under Apache License 2.0. KLU ERP Auto-Fill also includes or relies on third-party runtime components, model assets, and icons that may have separate terms. Apache-2.0 does not grant rights to material the project maintainer does not own or have permission to license.
 
 ## ONNX Runtime Web
 
