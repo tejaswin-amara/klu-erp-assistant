@@ -1,0 +1,24 @@
+# Third-Party Notices
+
+KLU ERP Auto-Fill includes or relies on third-party runtime components and model assets. Their terms are separate from the project's own licensing status.
+
+## ONNX Runtime Web
+
+The extension bundles ONNX Runtime Web JavaScript and WebAssembly runtime files under `lib/`. Consult the upstream project for its current license and notices:
+
+- Project: https://github.com/microsoft/onnxruntime
+- Documentation: https://onnxruntime.ai/docs/tutorials/web/
+
+Redistributions should retain the applicable upstream license and notices associated with the exact bundled version.
+
+## CRNN model and metadata
+
+The repository includes model assets and metadata under `model/`, including `crnn.onnx` and `crnn.json`. The model's provenance, training data, and applicable license should be verified from its original source before reuse or redistribution. Do not assume the project's repository license notice grants rights to these assets.
+
+## Other bundled files
+
+For any additional library, model, font, icon, or other third-party asset, record its name, version or source, copyright holder when known, applicable license, and required notice here or in a dedicated notices file. Preserve license files distributed with dependencies.
+
+## Important
+
+This inventory is a documentation starting point, not a complete legal determination of every file's licensing status. Review the exact files and upstream license terms before publishing a release or redistributing bundled assets.
