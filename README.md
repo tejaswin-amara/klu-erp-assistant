@@ -286,9 +286,9 @@ Keep changes focused, test them against the intended environment, and document n
 - GitHub: [@tejaswin-amara](https://github.com/tejaswin-amara)
 - Repository: [klu-erp-autofill](https://github.com/tejaswin-amara/klu-erp-autofill)
 
-## License
+## License and legal notice
 
-The repository's [LICENSE](LICENSE) file currently states that **no project open-source license has been granted**. Do not assume that public availability on GitHub grants permission to use, modify, or redistribute the source code. Bundled third-party libraries and model assets may have separate terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The original project code and documentation authored for this repository are licensed under the [Apache License 2.0](LICENSE). It permits use, modification, and redistribution subject to its terms, and includes warranty and limitation-of-liability language **to the extent permitted by applicable law**. It cannot guarantee immunity from legal claims. Third-party libraries and model assets may be subject to separate terms; review [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and confirm you have the rights to license every included asset before redistributing it.
 
 ---
 
