@@ -74,4 +74,4 @@ Use concise, descriptive commit messages. A conventional format is encouraged:
 
 Be factual, respectful, and open to technical feedback. Maintainers may request revisions, decline changes outside the project's scope, or close contributions that introduce security, privacy, or policy risks.
 
-By submitting a contribution, you confirm that you have the right to submit it and that you have not knowingly included third-party material without appropriate rights or attribution.
+By submitting a contribution, you confirm that you have the right to submit it and that you have not knowingly included third-party material without appropriate rights or attribution. Unless a separate written agreement says otherwise, contributions intentionally submitted for inclusion are handled under Apache-2.0 as described in that license.
