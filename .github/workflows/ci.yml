@@ -1,0 +1,30 @@
+name: Repository quality gates
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run structural regression tests
+        run: npm test
+      - name: Test release packager
+        run: npm run test:package
+      - name: Build release archive
+        run: python scripts/package_extension.py --output "$RUNNER_TEMP/klu-erp-autofill.zip"

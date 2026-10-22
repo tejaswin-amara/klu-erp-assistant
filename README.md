@@ -61,6 +61,8 @@
 - [Configuration and compatibility](#configuration-and-compatibility)
 - [Privacy and security](#privacy-and-security)
 - [Troubleshooting](#troubleshooting)
+- [Testing and release packaging](#testing-and-release-packaging)
+- [Known limitations](#known-limitations)
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
@@ -192,7 +194,7 @@ The metadata defines the model's recognition alphabet and CTC blank index. Chang
 
 The recognition pipeline uses the model and runtime bundled with the extension and does not require a separate remote OCR backend. This does **not** mean the ERP website itself operates offline: normal website communication still occurs.
 
-- **Console logging:** The current content script logs diagnostic messages, including recognized CAPTCHA text. Do not share unredacted console logs or screenshots containing verification codes.
+- **Console logging:** The current content script writes caught runtime errors to the browser console. It does not explicitly log the recognized string. Error details may still contain technical information, so redact console output before sharing it.
 - **Credentials:** The extension is intended to fill the verification field, not to collect or manage account credentials. Review the source before installing or distributing a modified build.
 - **Scope:** Review `manifest.json` before changing the domain on which the content script can run.
 - **Accuracy:** Recognition can be incorrect. Check the result before submitting.
@@ -241,6 +243,32 @@ Recognition accuracy is not guaranteed. It depends on the CAPTCHA image, the mod
 
 </details>
 
+## Testing and release packaging
+
+The repository includes dependency-free structural checks and a standard-library ZIP packager. These checks validate the extension manifest, packaged file references, metadata shape, documentation presence, and manual-submission safeguards. They do **not** measure recognition accuracy or validate the model's training-time preprocessing contract.
+
+Requirements: Node.js 20 or newer and Python 3.10 or newer.
+
+Run the checks:
+
+```bash
+npm test
+npm run test:package
+npm run check
+```
+
+Build a reproducible release archive (the output ZIP contains extension files and relevant notices, plus a generated `CHECKSUMS.sha256`):
+
+```bash
+python scripts/package_extension.py --output dist/klu-erp-autofill.zip
+```
+
+The release archive excludes repository-only files such as `.gitignore`, test sources, packaging scripts, and CI configuration. The script also writes a SHA-256 sidecar for the completed ZIP.
+
+## Known limitations
+
+The repository does not include a verified training-time preprocessing specification or a representative, held-out recognition benchmark. Passing the structural tests is not evidence of CAPTCHA recognition accuracy. Treat recognition as fallible, verify the value manually, and use the extension only where the institution and service permit it. CI does not tune or evaluate CAPTCHA solving against the live ERP.
+
 ## Development
 
 1. Clone the repository.
@@ -254,7 +282,7 @@ This is a browser extension rather than a conventional Node.js application. No p
 
 ## Contributing
 
-Contributions that improve reliability, maintainability, and transparency are welcome. Read the [contribution guidelines](CONTRIBUTING.md) before opening a pull request. Community participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md); use the [issue templates](.github/ISSUE_TEMPLATE/) for bug reports and feature requests.
+Contributions that improve reliability, maintainability, and transparency are welcome. Read the [contribution guidelines](CONTRIBUTING.md) before opening a pull request. Community participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md); use the [GitHub issue tracker](https://github.com/tejaswin-amara/klu-erp-autofill/issues/new/choose) for bug reports and feature requests.
 
 Potential areas for improvement:
 
