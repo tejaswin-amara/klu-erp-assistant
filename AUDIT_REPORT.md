@@ -36,11 +36,11 @@ The review inspected the current manifest, content script, model metadata, repos
 
 The current allowlist comprises the manifest, content script, model metadata and binary, ONNX Runtime JavaScript and SIMD WASM assets, three icons, README, Apache-2.0 license, NOTICE, third-party notices, security/support/contribution/community documents, changelog, privacy notes, and README banner. The archive also contains the generated checksum manifest.
 
-The CI artifact from the baseline workflow was named `klu-erp-autofill-extension`, had a reported size of 15,673,325 bytes, and was available at the time of this review. GitHub Actions artifacts expire; use the [workflow run](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39735774987) or a future release for the currently available artifact.
+The post-merge CI artifact is named `klu-erp-autofill-extension`; its GitHub artifact ID is `12426453480` and it was created on 2026-10-22. [Download/open the artifact through its workflow run](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39781458278). GitHub Actions artifacts expire, so publish a formal GitHub Release if a stable distribution link is required.
 
 ## Test limits
 
-The baseline suite contained eight Node.js structural tests and four Python packaging tests. It was not a behavioral integration suite for the browser, ONNX graph, training-time preprocessing, or recognition quality. This follow-up adds checks for relative Markdown links, unsuppressed CI failures, exact release archive contents, and byte-for-byte deterministic ZIP output. Their result must be confirmed by the follow-up CI run.
+The baseline suite contained eight Node.js structural tests and four Python packaging tests. The follow-up added checks for relative Markdown links, unsuppressed CI failures, exact release archive contents, and byte-for-byte deterministic ZIP output. The post-merge CI run [39781458278](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39781458278) passed all 10 Node.js tests and all 5 Python packaging tests, built the release ZIP, and uploaded the artifact. The build log reported the inner release ZIP SHA-256 as `613ce03f907c6c0e5db64c31baff1db3a423f2d39eaa476718bbce5470653996`.
 
 No accuracy or model-quality claim is made by this audit.
 
