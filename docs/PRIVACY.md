@@ -8,7 +8,7 @@ KLU ERP Auto-Fill is a browser extension intended to recognize CAPTCHA text on t
 
 The repository bundles a CRNN ONNX model and ONNX Runtime Web assets for browser-side inference. The extension's intended recognition path processes the CAPTCHA in the browser rather than uploading it to a project-operated recognition server.
 
-The content script includes debug logging. Depending on the code path, console messages may include model-loading information and the recognized alphabet or CAPTCHA text. Browser console output is local to the browser unless the user or another installed tool exports or transmits it. Avoid sharing unredacted logs.
+The current content script writes caught runtime errors to the browser console with a fixed diagnostic prefix. It does not explicitly log the recognized string. Runtime error objects may contain technical details; redact console output before sharing it. Browser console output is local to the browser unless the user or another installed tool exports or transmits it.
 
 This document describes the repository implementation, not the university portal's own data practices or the behavior of other extensions, browser software, or third-party components.
 
@@ -28,7 +28,7 @@ Any future change that introduces telemetry, remote processing, new host permiss
 
 ## How to inspect
 
-Review `manifest.json` for host matches and exposed resources, and `content.js` for the recognition flow and console logging. Browser developer tools can help inspect extension errors and network behavior.
+Review `manifest.json` for host matches and exposed resources, and `content.js` for the recognition flow and logging behavior. The automated tests check repository structure and packaging invariants; they do not establish model accuracy or prove the absence of all network activity. Browser developer tools can help inspect extension errors and network behavior.
 
 ## Scope and limitations
 

@@ -1,0 +1,14 @@
+{
+  "name": "klu-erp-autofill",
+  "version": "1.0.3",
+  "private": true,
+  "description": "Validation and reproducible packaging checks for the KLU ERP Auto-Fill extension",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:package": "python -m unittest discover -s tests -p 'test_*.py'",
+    "check": "npm test && npm run test:package"
+  }
+}

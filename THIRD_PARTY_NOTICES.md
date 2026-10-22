@@ -1,29 +1,31 @@
 # Third-Party Notices
 
-The project's original code and documentation are licensed under Apache License 2.0. KLU ERP Auto-Fill also includes or relies on third-party runtime components, model assets, and icons that may have separate terms. Apache-2.0 does not grant rights to material the project maintainer does not own or have permission to license.
+This repository's original code and documentation are licensed under Apache License 2.0. Third-party runtime components, model assets, and icons can have separate terms. The repository license does not grant rights to materials the project maintainer does not own or have permission to redistribute.
 
 ## ONNX Runtime Web
 
-The extension bundles ONNX Runtime Web JavaScript and WebAssembly runtime files under `lib/`. Consult the upstream project for its current license and notices:
+The repository bundles ONNX Runtime Web JavaScript and WebAssembly files under the lib directory. The upstream ONNX Runtime project identifies its project license as MIT: https://github.com/microsoft/onnxruntime.
 
-- Project: https://github.com/microsoft/onnxruntime
-- Documentation: https://onnxruntime.ai/docs/tutorials/web/
+The exact version used to produce the bundled runtime files has not been verified by the repository's current metadata. Before making a release, verify the runtime version and retain any release-specific third-party notices shipped with that version.
 
-Redistributions should retain the applicable upstream license and notices associated with the exact bundled version.
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## CRNN model and metadata
 
-The repository includes model assets and metadata under `model/`, including `crnn.onnx` and `crnn.json`. The model's provenance, training data, and applicable license should be verified from its original source before reuse or redistribution. Do not assume the project's repository license notice grants rights to these assets.
+The repository includes model assets and metadata under the model directory, including crnn.onnx and crnn.json. The model's provenance, training data, and applicable license have not been established by this notice. Verify these details from the original source before reuse or redistribution; do not assume the repository license grants rights to model assets.
 
 ## Other bundled files
 
-For any additional library, model, font, icon, or other third-party asset, record its name, version or source, copyright holder when known, applicable license, and required notice here or in a dedicated notices file. Preserve license files distributed with dependencies.
+For any additional library, model, icon, or other third-party asset, record its name, version or source, copyright holder when known, applicable license, and required notices. Preserve license files distributed with dependencies.
 
 ## Important
 
-This inventory is a documentation starting point, not a complete legal determination of every file's licensing status. Review the exact files and upstream license terms before publishing a release or redistributing bundled assets.
-
-
-## Project license scope
-
-The repository's Apache-2.0 license is intended for original project code and documentation authored for this repository by the copyright holder. It does not override separate licenses, copyright, trademark, or other rights applying to third-party components or assets. The exact provenance and licensing status of the bundled CRNN model and metadata should be confirmed before redistribution. Do not assume this notice itself grants rights to third-party materials.
+This document is an attribution and verification starting point, not a legal determination that every bundled artifact's licensing status has been resolved. Check the exact runtime distribution and all model and asset provenance before publishing or redistributing a release.
