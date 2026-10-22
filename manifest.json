@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "KLU ERP Captcha Auto-Fill",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Auto-fills the verification code on KL University ERP login. 100% on-device, no servers, no data collected.",
   "content_scripts": [
     {
@@ -20,8 +20,7 @@
       "resources": [
         "model/crnn.onnx",
         "model/crnn.json",
-        "lib/ort-wasm-simd.wasm",
-        "lib/ort-wasm.wasm"
+        "lib/ort-wasm-simd.wasm"
       ],
       "matches": [
         "https://newerp.kluniversity.in/*"
