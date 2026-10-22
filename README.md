@@ -70,27 +70,17 @@
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Changelog](CHANGELOG.md)
 
-## How it works
+## ⚙️ How It Works
+
+**KLU ERP Auto-Fill** bridges web automation and on-device machine learning directly inside a Content Script. Here is the step-by-step technical pipeline executed locally every time you open the ERP portal:
 
 ```mermaid
-flowchart TD
-    A["KLU ERP Login Page"] --> B["Detect CAPTCHA Image + Input"]
-    B --> C["Load CRNN Model + Metadata"]
-    C --> D["Preprocess Image"]
-    D --> E["ONNX Runtime Web"]
-    E --> F["WebAssembly Inference"]
-    F --> G["CTC Greedy Decoding"]
-    G --> H["Fill Verification Field"]
-    H --> I["Dispatch Input + Change Events"]
-    J["CAPTCHA Image Refresh"] --> K["MutationObserver"]
-    K --> B
-
-    classDef browser fill:#10243a,stroke:#4dd6c8,color:#f8fafc
-    classDef inference fill:#241c46,stroke:#a78bfa,color:#f8fafc
-    classDef output fill:#12372f,stroke:#34d399,color:#f8fafc
-    class A,B,C,D,J,K browser
-    class E,F,G inference
-    class H,I output
+graph TD
+    A[Page Load / Refresh] --> B[Detect CAPTCHA Image & Input]
+    B --> C[Extract RGBA Alpha Channel to Float32 Tensor]
+    C --> D[Run In-Browser CRNN ONNX Model via WASM SIMD]
+    D --> E[CTC Greedy Decode Logits to String]
+    E --> F[Inject Solved Code & Dispatch Native Events]
 ```
 
 ### Recognition pipeline
