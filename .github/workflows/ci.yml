@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Run structural regression tests
@@ -28,3 +28,12 @@ jobs:
         run: npm run test:package
       - name: Build release archive
         run: python scripts/package_extension.py --output "$RUNNER_TEMP/klu-erp-autofill.zip"
+      - name: Upload release archive and checksum
+        uses: actions/upload-artifact@v7
+        with:
+          name: klu-erp-autofill-extension
+          path: |
+            ${{ runner.temp }}/klu-erp-autofill.zip
+            ${{ runner.temp }}/klu-erp-autofill.zip.sha256
+          if-no-files-found: error
+          retention-days: 14
