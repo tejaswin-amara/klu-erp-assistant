@@ -35,8 +35,10 @@ Suggested branch names: `fix/short-description`, `docs/short-description`, or `f
 
 ## Testing checklist
 
-There is no package-manager build command assumed by the current repository structure. At minimum, for relevant changes:
+The extension runtime has no bundling step. Repository validation is available through the npm scripts in `package.json`; CI currently uses Node.js 22 and Python 3.12. At minimum, for relevant changes:
 
+- Run `npm run check` to execute the dependency-free repository and packaging tests.
+- Build a release ZIP with `python scripts/package_extension.py --output dist/klu-erp-autofill.zip` and verify its contents and checksum.
 - Load the extension as an unpacked extension in a current Chrome/Chromium browser.
 - Confirm that the extension loads without manifest errors.
 - Verify model and WebAssembly resources load from their expected local paths.

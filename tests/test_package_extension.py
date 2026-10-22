@@ -45,7 +45,15 @@ class PackageExtensionTests(unittest.TestCase):
                 "icons/icon16.png", "icons/icon48.png", "icons/icon128.png",
                 "CHECKSUMS.sha256",
             }
-            self.assertTrue(required.issubset(names), "Missing files: " + str(required - names))
+            expected_release_files = {
+                "manifest.json", "content.js", "README.md", "LICENSE", "NOTICE",
+                "THIRD_PARTY_NOTICES.md", "SECURITY.md", "SUPPORT.md", "CHANGELOG.md",
+                "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "assets/readme-banner.svg",
+                "docs/PRIVACY.md", "icons/icon16.png", "icons/icon48.png",
+                "icons/icon128.png", "lib/ort.min.js", "lib/ort-wasm-simd.wasm",
+                "model/crnn.json", "model/crnn.onnx", "CHECKSUMS.sha256",
+            }
+            self.assertEqual(names, expected_release_files, "Unexpected release archive contents")
             self.assertNotIn(".gitignore", names)
             self.assertFalse(any(name.startswith(".github/") for name in names))
             self.assertFalse(any(name.startswith("tests/") for name in names))
@@ -87,6 +95,32 @@ class PackageExtensionTests(unittest.TestCase):
             digest, name = sidecar.read_text(encoding="utf-8").split()
             self.assertEqual(name, self.output.name)
             self.assertEqual(hashlib.sha256(self.output.read_bytes()).hexdigest(), digest)
+
+
+    def test_archive_is_byte_for_byte_deterministic(self) -> None:
+        first_result = subprocess.run(
+            [sys.executable, str(PACKAGER), "--output", str(self.output)],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(first_result.returncode, 0, first_result.stderr + first_result.stdout)
+
+        second_output = Path(self.temp_dir.name) / "second.zip"
+        second_result = subprocess.run(
+            [sys.executable, str(PACKAGER), "--output", str(second_output)],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(second_result.returncode, 0, second_result.stderr + second_result.stdout)
+        self.assertEqual(
+            self.output.read_bytes(),
+            second_output.read_bytes(),
+            "Rebuilding the same source tree should produce identical ZIP bytes",
+        )
 
 
 if __name__ == "__main__":

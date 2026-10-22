@@ -88,3 +88,52 @@ test("explicit log calls do not pass recognized-code variables", () => {
     assert.doesNotMatch(call, /\b(?:recognizedText|captchaText|solvedCode|captchaCode)\b/i);
   }
 });
+
+
+test("relative Markdown links in maintained docs resolve to repository files", () => {
+  const markdownFiles = [
+    "README.md",
+    "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "SUPPORT.md",
+    "THIRD_PARTY_NOTICES.md",
+    "docs/PRIVACY.md",
+    ".github/ISSUE_TEMPLATE/bug_report.md",
+    ".github/ISSUE_TEMPLATE/feature_request.md"
+  ].filter(exists);
+
+  const linkPattern = /\\[[^\\]]*\\]\\(([^)\\s]+)(?:\\s+["'][^"']*["'])?\\)/g;
+
+  for (const documentPath of markdownFiles) {
+    const source = read(documentPath);
+    for (const match of source.matchAll(linkPattern)) {
+      let target = match[1].replace(/^<|>$/g, "");
+      if (!target || /^(?:[a-z][a-z0-9+.-]*:|\\/\\/)/i.test(target)) continue;
+
+      const pathname = decodeURIComponent(target.split("#", 1)[0].split("?", 1)[0]);
+      if (!pathname) continue;
+
+      const resolved = path.resolve(ROOT, path.dirname(documentPath), pathname);
+      const relative = path.relative(ROOT, resolved);
+      assert.ok(
+        relative !== ".." && !relative.startsWith(".." + path.sep) && !path.isAbsolute(relative),
+        `Relative link escapes repository in ${documentPath}: ${target}`
+      );
+      assert.ok(
+        fs.existsSync(resolved),
+        `Broken relative Markdown link in ${documentPath}: ${target}`
+      );
+    }
+  }
+});
+
+test("CI executes quality gates without masking failures", () => {
+  const workflow = read(".github/workflows/ci.yml");
+  assert.match(workflow, /run:\\s*npm test/);
+  assert.match(workflow, /run:\\s*npm run test:package/);
+  assert.match(workflow, /scripts\\/package_extension\\.py/);
+  assert.doesNotMatch(workflow, /\\|\\|\\s*(?:echo|true)\\b/);
+  assert.doesNotMatch(workflow, /continue-on-error:\\s*true/);
+});

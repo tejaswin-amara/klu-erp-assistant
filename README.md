@@ -1,4 +1,5 @@
 <!-- KLU ERP Auto-Fill | Project documentation -->
+<a id="klu-erp-auto-fill"></a>
 
 <div align="center">
   <img src="assets/readme-banner.svg" alt="KLU ERP Auto-Fill — Chrome extension for local CAPTCHA recognition" width="100%">
@@ -71,6 +72,8 @@
 - [Support](SUPPORT.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Changelog](CHANGELOG.md)
+
+<a id="how-it-works"></a>
 
 ## ⚙️ How It Works
 
@@ -278,7 +281,7 @@ The repository does not include a verified training-time preprocessing specifica
 5. Reload the extension and ERP tab after changes.
 6. Test model loading, missing page elements, recognition failures, and CAPTCHA refresh handling.
 
-This is a browser extension rather than a conventional Node.js application. No package manager or build command is assumed by the current project structure.
+The extension itself does not require a bundling step. Repository checks and release packaging use the npm scripts and Python utility documented above; these tools are not required to load the unpacked extension.
 
 ## Contributing
 
@@ -300,6 +303,8 @@ Keep changes focused, test them against the intended environment, and document n
 
 - GitHub: [@tejaswin-amara](https://github.com/tejaswin-amara)
 - Repository: [klu-erp-autofill](https://github.com/tejaswin-amara/klu-erp-autofill)
+
+<a id="license"></a>
 
 ## License and legal notice
 
