@@ -90,6 +90,7 @@ test("explicit log calls do not pass recognized-code variables", () => {
 });
 
 
+
 test("relative Markdown links in maintained docs resolve to repository files", () => {
   const markdownFiles = [
     "README.md",
@@ -104,13 +105,13 @@ test("relative Markdown links in maintained docs resolve to repository files", (
     ".github/ISSUE_TEMPLATE/feature_request.md"
   ].filter(exists);
 
-  const linkPattern = /\\[[^\\]]*\\]\\(([^)\\s]+)(?:\\s+["'][^"']*["'])?\\)/g;
+  const linkPattern = /\[[^\]]*\]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/g;
 
   for (const documentPath of markdownFiles) {
     const source = read(documentPath);
     for (const match of source.matchAll(linkPattern)) {
-      let target = match[1].replace(/^<|>$/g, "");
-      if (!target || /^(?:[a-z][a-z0-9+.-]*:|\\/\\/)/i.test(target)) continue;
+      const target = match[1].replace(/^<|>$/g, "");
+      if (!target || /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(target)) continue;
 
       const pathname = decodeURIComponent(target.split("#", 1)[0].split("?", 1)[0]);
       if (!pathname) continue;
@@ -119,11 +120,11 @@ test("relative Markdown links in maintained docs resolve to repository files", (
       const relative = path.relative(ROOT, resolved);
       assert.ok(
         relative !== ".." && !relative.startsWith(".." + path.sep) && !path.isAbsolute(relative),
-        `Relative link escapes repository in ${documentPath}: ${target}`
+        "Relative link escapes repository in " + documentPath + ": " + target
       );
       assert.ok(
         fs.existsSync(resolved),
-        `Broken relative Markdown link in ${documentPath}: ${target}`
+        "Broken relative Markdown link in " + documentPath + ": " + target
       );
     }
   }
@@ -131,9 +132,9 @@ test("relative Markdown links in maintained docs resolve to repository files", (
 
 test("CI executes quality gates without masking failures", () => {
   const workflow = read(".github/workflows/ci.yml");
-  assert.match(workflow, /run:\\s*npm test/);
-  assert.match(workflow, /run:\\s*npm run test:package/);
-  assert.match(workflow, /scripts\\/package_extension\\.py/);
-  assert.doesNotMatch(workflow, /\\|\\|\\s*(?:echo|true)\\b/);
-  assert.doesNotMatch(workflow, /continue-on-error:\\s*true/);
+  assert.match(workflow, /run:\s*npm test/);
+  assert.match(workflow, /run:\s*npm run test:package/);
+  assert.match(workflow, /scripts\/package_extension\.py/);
+  assert.doesNotMatch(workflow, /\|\|\s*(?:echo|true)\b/);
+  assert.doesNotMatch(workflow, /continue-on-error:\s*true/);
 });
