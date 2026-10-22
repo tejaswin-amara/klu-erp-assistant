@@ -121,19 +121,16 @@ flowchart TD
 klu-erp-autofill/
 ├── manifest.json
 ├── content.js
-├── assets/
-│   └── readme-banner.svg
+├── icons/
+│   ├── icon16.png
+│   ├── icon48.png
+│   └── icon128.png
 ├── model/
 │   ├── crnn.onnx
 │   └── crnn.json
-├── lib/
-│   ├── ort.min.js
-│   ├── ort-wasm-simd.wasm
-│   └── ort-wasm.wasm
-└── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+└── lib/
+    ├── ort.min.js
+    └── ort-wasm-simd.wasm
 ```
 
 | File or directory | Description |
