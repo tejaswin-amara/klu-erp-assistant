@@ -94,6 +94,10 @@ test("explicit log calls do not pass recognized-code variables", () => {
 test("relative Markdown links in maintained docs resolve to repository files", () => {
   const markdownFiles = [
     "README.md",
+    "AUDIT_REPORT.md",
+    "IMPROVEMENT_BACKLOG.md",
+    "FIX_IMPLEMENTATION_GUIDE.md",
+    "TEST_AND_VERIFICATION_PLAN.md",
     "CHANGELOG.md",
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
@@ -137,4 +141,32 @@ test("CI executes quality gates without masking failures", () => {
   assert.match(workflow, /scripts\/package_extension\.py/);
   assert.doesNotMatch(workflow, /\|\|\s*(?:echo|true)\b/);
   assert.doesNotMatch(workflow, /continue-on-error:\s*true/);
+});
+
+
+test("audit companion documents and machine-readable backlog are valid", () => {
+  for (const file of [
+    "AUDIT_REPORT.md",
+    "IMPROVEMENT_BACKLOG.md",
+    "FIX_IMPLEMENTATION_GUIDE.md",
+    "TEST_AND_VERIFICATION_PLAN.md",
+    "audit/improvement-backlog.json"
+  ]) {
+    assert.ok(exists(file), "Missing audit artifact: " + file);
+    assert.ok(read(file).trim().length > 0, "Empty audit artifact: " + file);
+  }
+
+  const backlog = JSON.parse(read("audit/improvement-backlog.json"));
+  assert.equal(backlog.repository, "https://github.com/tejaswin-amara/klu-erp-autofill");
+  assert.ok(Array.isArray(backlog.tasks) && backlog.tasks.length > 0);
+
+  const ids = backlog.tasks.map((task) => task.taskId);
+  assert.equal(new Set(ids).size, ids.length, "Duplicate task IDs found");
+  for (const task of backlog.tasks) {
+    assert.match(task.priority, /^P[0-3]$/);
+    assert.equal(typeof task.title, "string");
+    assert.ok(task.title.length > 0);
+    assert.ok(Array.isArray(task.acceptanceCriteria) && task.acceptanceCriteria.length > 0);
+    assert.ok(Array.isArray(task.dependencies));
+  }
 });
