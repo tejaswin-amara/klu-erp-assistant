@@ -1,57 +1,180 @@
-# Repository Audit Report
+# Comprehensive Repository Audit Report — KLU ERP AutoFill
 
 **Repository:** [tejaswin-amara/klu-erp-autofill](https://github.com/tejaswin-amara/klu-erp-autofill)  
-**Baseline commit reviewed:** `f12d0c71345ea82ffe9176cc6b945bba87adb2e9`  
-**Original audit baseline:** `8b76aaf300d9a0dfb8dea2822e5dc2a1083d47dd`  
-**Review date:** 2026-10-22
+**Audited branch:** `main`  
+**Audited HEAD:** `682d1b7f53294a81e57b721eafe5d6259ef787e5`  
+**Audit date:** 2026-10-23  
+**Latest observed CI run:** [39808685305 — success](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39808685305)
 
-## Executive summary
+## 1. Executive summary
 
-The original audit described an older revision. The quality-gates and packaging work was subsequently merged in commit `f12d0c71345ea82ffe9176cc6b945bba87adb2e9`. The current repository contains Node.js structural tests, Python packaging tests, a CI workflow, and an allowlisted ZIP packager. The baseline workflow run [39735774987](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39735774987) completed successfully.
+The repository has baseline engineering controls in place: a Manifest V3 manifest, a narrowly scoped content script, bundled ONNX Runtime Web assets, Node.js structural tests, Python packaging tests, an explicit release-file allowlist, embedded checksums, a ZIP sidecar checksum, and GitHub Actions quality gates.
 
-A passing repository-quality workflow does **not** prove runtime recognition correctness, model compatibility, browser compatibility, or legal provenance. The core `content.js` behavior has not been fully remediated by the quality-gates commit.
+The workflow for the audited HEAD completed successfully. Its logs show 10 Node.js tests passed, 5 Python packaging tests passed, release ZIP generation succeeded, and the artifact upload succeeded. This establishes repository and packaging checks, **not** runtime correctness, model compatibility, browser compatibility, recognition accuracy, or licensing provenance.
 
-## Scope and evidence
+The material remaining issues are:
+- Asynchronous lifecycle state can drop a trigger while work is in flight and may allow an obsolete inference result to be applied after the image changes.
+- Comma-separated selectors used with `querySelector()` do not implement explicit selector priority.
+- Metadata, tensor shape, and decoder class mapping are not fully validated; the configured blank index is not consumed by the existing decoder.
+- Old image listeners and the initial observer timeout do not have comprehensive cleanup paths.
+- Current tests are largely structural and packaging-focused; they do not execute the full content-script lifecycle against a browser-like synthetic DOM or inspect the actual ONNX graph.
+- Exact ONNX Runtime version, model training provenance, and full icon/font attribution remain unresolved.
 
-The review inspected the current manifest, content script, model metadata, repository tests, packaging utility, CI workflow, documentation, and third-party notices. Findings below are classified according to direct source evidence; questions requiring the original training specification or real Chromium behavior remain explicitly unresolved.
+This is an evidence-based audit and remediation specification. It does not claim that the production recognition algorithm has been fixed. Contract-dependent and browser-dependent changes remain blocked until the required evidence is available. Preserve human verification and manual form submission.
 
-## Finding disposition
+## 2. Scope and evidence
 
-| ID | Status | Evidence / disposition |
-| --- | --- | --- |
-| AUDIT-001 — asynchronous lifecycle and stale results | **Open; source issue confirmed** | Current `content.js` exits when `isSolving` is true and does not fully associate the inference result with a still-current image source before writing the field. No runtime fix is included in the quality-gates commit. |
-| AUDIT-002 — selector priority | **Open; source issue confirmed** | The combined comma-separated selector is passed to `querySelector`; selector-list ordering does not guarantee priority over document order. |
-| AUDIT-003 — metadata and output contract | **Open; partially confirmed** | Metadata response status and runtime schema are not comprehensively validated, `blank_idx` is not used by the current decoder, and output dimensions are assumed. The existing structural test validates metadata shape but does not prove the runtime honors it. |
-| AUDIT-004 — no tests or CI | **Fixed at baseline** | `tests/repository.test.mjs`, `tests/test_package_extension.py`, `package.json`, and `.github/workflows/ci.yml` are present. The baseline CI run passed the Node test, Python package test, ZIP build, and artifact upload steps. |
-| AUDIT-005 — release archive contents | **Fixed at baseline** | `scripts/package_extension.py` uses an explicit 20-file allowlist. It includes project and third-party notices, embeds `CHECKSUMS.sha256`, and writes a SHA-256 sidecar for the ZIP. The package tests verify required files, manifest references, embedded checksums, and the sidecar. |
-| AUDIT-006 — documentation drift and broken links | **Partially fixed; follow-up validation added** | README privacy statements and third-party notices were updated in the quality-gates commit. Changelog version drift and stable fragment targets needed additional attention; repository tests now check relative Markdown links. |
-| AUDIT-007 — alpha-channel preprocessing | **Unresolved; defect classification requires model evidence** | The current script reads the alpha component. Whether this contradicts the trained model's preprocessing contract cannot be established without the actual training/inference specification. Do not infer a correct replacement channel or reject valid images based on an unverified heuristic. |
-| AUDIT-008 — SIMD browser compatibility | **Unverified** | The manifest has no explicit minimum Chrome version. The bundled runtime version and minimum supported browser have not been independently established through a compatibility test. Do not add runtime flags without verifying the bundled API. |
-| AUDIT-009 — third-party licenses and provenance | **Partially fixed** | The third-party notice contains the ONNX Runtime MIT license text and explicitly marks the exact bundled version and model provenance as unverified. Icon/font attribution and model training-data provenance still require source evidence. |
-| AUDIT-010 — listeners and observer timer cleanup | **Open; source lifecycle concern** | The current observer/listener lifecycle does not comprehensively remove old image listeners or clear the body-observer timeout on every early disconnect path. |
-| AUDIT-011 — dynamic web-accessible URLs | **Optional; unverified** | `use_dynamic_url` is not configured. It should not be introduced without a Chromium test proving the ONNX model and WASM resource paths still resolve. |
-| HIST-001 — historical paths and CRX ID | **Informational** | Historical repository data may contain local build paths and an extension identifier. No active credential exposure was established by this source review; an extension ID is not itself an authentication secret. |
+Inspected current GitHub file contents for `content.js`, `manifest.json`, `model/crnn.json`, `package.json`, the Node/Python test suites, `scripts/package_extension.py`, the CI workflow, README/changelog/contributor/privacy/third-party notice documentation, and the latest relevant workflow results.
 
-## Release packaging
+The local shell could not clone GitHub during this session because external DNS/network access was unavailable. No test command was directly executed in that shell. Test outcomes below come from the GitHub Actions run associated with the audited commit.
 
-The current allowlist comprises the manifest, content script, model metadata and binary, ONNX Runtime JavaScript and SIMD WASM assets, three icons, README, Apache-2.0 license, NOTICE, third-party notices, security/support/contribution/community documents, changelog, privacy notes, and README banner. The archive also contains the generated checksum manifest.
+The binary `model/crnn.onnx` and bundled runtime binary payloads were not independently inspected with an ONNX parser or local Chromium. Their graph signatures, precise embedded runtime version, and training-time preprocessing contract remain unverified.
 
-The post-merge CI artifact is named `klu-erp-autofill-extension`; its GitHub artifact ID is `12426453480` and it was created on 2026-10-22. [Download/open the artifact through its workflow run](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39781458278). GitHub Actions artifacts expire, so publish a formal GitHub Release if a stable distribution link is required.
+## 3. Current baseline
 
-## Test limits
+| Property | Observed state |
+|---|---|
+| Repository | [GitHub](https://github.com/tejaswin-amara/klu-erp-autofill) |
+| Branch / HEAD | `main` / `682d1b7f53294a81e57b721eafe5d6259ef787e5` |
+| Extension version | `1.0.3` |
+| Manifest | Manifest V3; no declared Chrome API permissions or host permissions |
+| Match pattern | `https://newerp.kluniversity.in/*` |
+| Metadata | `model/crnn.json` describes alphabet, 120×50 dimensions, `model_kind: crnn_ctc`, and `blank_idx: 0` |
+| CI | [Run 39808685305](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39808685305), success |
+| Packaging | Fixed allowlist, normalized ZIP timestamps/attributes, embedded per-file checksums, ZIP sidecar |
 
-The baseline suite contained eight Node.js structural tests and four Python packaging tests. The follow-up added checks for relative Markdown links, unsuppressed CI failures, exact release archive contents, and byte-for-byte deterministic ZIP output. The post-merge CI run [39781458278](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39781458278) passed all 10 Node.js tests and all 5 Python packaging tests, built the release ZIP, and uploaded the artifact. The build log reported the inner release ZIP SHA-256 as `613ce03f907c6c0e5db64c31baff1db3a423f2d39eaa476718bbce5470653996`.
+The CI log shows **10 Node.js tests passed / 0 failed**, **5 Python packaging tests passed**, archive generation succeeded, and artifact upload succeeded. The inner release ZIP SHA-256 reported by the build log was:
 
-No accuracy or model-quality claim is made by this audit.
+```text
+6650149c8ea336f5c4838c95130e27a182f8e286e90d559f2eb328be88fd6f11
+```
 
-## Responsible-use boundary
+The uploaded artifact was named `klu-erp-autofill-extension`, artifact ID `12439905014`. The GitHub artifact bundle digest differs from the inner ZIP hash. [View/download via the workflow run](https://github.com/tejaswin-amara/klu-erp-autofill/actions/runs/39808685305). GitHub Actions artifacts expire and are not a permanent release host.
 
-This repository targets a production university ERP and automates a CAPTCHA field. This follow-up improves repository quality, documentation, test integrity, and artifact reproducibility; it does not tune or harden production CAPTCHA solving. Any future behavioral evaluation must use synthetic fixtures or an expressly authorized non-production test harness, preserve human verification, and retain manual form submission.
+## 4. Architecture summary
 
-## Remaining review requirements
+1. `manifest.json` configures a Manifest V3 content script for the ERP HTTPS host and declares local runtime, model, WASM, and icon resources.
+2. `content.js` locates image/input elements, loads JSON metadata and an ONNX session, creates an image tensor, invokes local inference, decodes output classes, and dispatches `input` and `change` events when populating the field.
+3. `lib/ort.min.js` and `lib/ort-wasm-simd.wasm` provide the bundled inference runtime.
+4. `model/crnn.json` and `model/crnn.onnx` contain model metadata and model data.
+5. The repository has structural tests, packaging tests, an allowlisted deterministic packager, checksum verification, and CI artifact publishing.
 
-1. Establish the model's original source, training dataset, license, and preprocessing contract from reliable provenance records.
-2. Determine the bundled ONNX Runtime version from upstream release metadata.
-3. Verify the icon/font source and applicable notice requirements.
-4. Perform browser compatibility checks in a controlled environment before changing SIMD or dynamic-resource settings.
-5. Review and prioritize open core-script findings using an authorized, non-production test setup.
+## 5. Finding matrix
+
+| ID | Finding | Severity | Priority | Disposition |
+|---|---|---:|---:|---|
+| ENV-001 | Audit-session local shell/network limitation | Low | P2 | Environment limitation; current-HEAD CI evidence is available |
+| AUDIT-001 | In-flight requests can be dropped and obsolete work may write after a refresh | High | P1 | Source issue confirmed; behavior regression tests missing |
+| AUDIT-002 | Comma-separated selectors do not provide explicit fallback priority | Medium | P1 | Source issue confirmed |
+| AUDIT-003 | Metadata/output contract gaps; declared blank index ignored | High | P1 | Runtime gaps confirmed; ONNX graph match unverified |
+| AUDIT-004 | Behavioral tests do not cover the actual async/DOM lifecycle | Medium | P1 | Current structural/packaging CI exists and passes; behavioral gaps remain |
+| AUDIT-005 | Packaging integrity and legal-file inclusion | Medium | P2 | Core allowlist/checksum/determinism controls exist; negative-path/integrity coverage can improve |
+| AUDIT-006 | Link path checks do not validate every heading fragment or factual claim | Low | P2 | Partially addressed |
+| AUDIT-007 | Alpha-channel behavior may not match model's training contract | High if mismatch | P1 | Blocked; no speculative preprocessing change |
+| AUDIT-008 | SIMD browser compatibility is not independently verified | Medium | P2 | Chromium verification required |
+| AUDIT-009 | Runtime version, model source/training data, and asset provenance incomplete | Medium | P2 | Unresolved provenance work |
+| AUDIT-010 | Listener/timer cleanup is incomplete for replacement and early disconnect paths | Medium | P2 | Source issue confirmed |
+| AUDIT-011 | Dynamic web-accessible resource URLs | Low | P3 | Optional and unverified; not a defect solely because it is disabled |
+| HIST-001 | Historical local paths or extension identifier | Informational | P3 | Review history, but an extension ID is not itself a credential |
+
+## 6. Detailed findings
+
+### AUDIT-001 — Async lifecycle and stale-result handling
+**Files:** `content.js`, especially `solveCaptcha()`.
+
+When `isSolving` is already true, a new call returns immediately. A refresh trigger can therefore be dropped. After `session.run()`, the current path does not fully verify that the image source and target element are still the ones associated with the operation before it updates the field.
+
+**Fix direction:** use an explicit operation identity/generation, capture source and target identity before async work, reject completions after state changes, verify connected target elements, release in-flight state on every path, and coalesce pending changes without unbounded retries.
+
+**Tests:** reverse-order promise completion, image/source replacement during pending work, detached input/image, initialization failure then retry, multiple refresh notifications, and exceptions on all async paths.
+
+### AUDIT-002 — Selector priority
+**Files:** `content.js`, the selector constants and their `querySelector()` call sites.
+
+Comma-separated selectors used in one `querySelector()` expression return the first match in document order, not priority according to textual selector order. The generic input selectors also do not consistently exclude hidden elements.
+
+**Fix direction:** use an ordered selector collection and explicitly filter candidates according to connection, type, visibility, and eligibility rules. Preserve the narrow host scope and do not add speculative live-site selectors.
+
+**Tests:** local fixture with hidden/generic candidates earlier in DOM order than the expected specific/visible candidate, plus disconnected and duplicate candidates.
+
+### AUDIT-003 — Model metadata and decoder contract
+**Files:** `content.js`, `model/crnn.json`, `model/crnn.onnx`.
+
+The metadata fetch does not check `response.ok` before parsing. The decoder hardcodes class zero as the blank class rather than consuming `blank_idx`. The runtime assumes particular input/output names and a rank-three output. There is no complete shape/class-count validation; an invalid class index may append `undefined` as text.
+
+**Fix direction:** validate metadata, outputs, dimensions, alphabet/class relationship, blank-index semantics, and index bounds. Confirm actual ONNX names/ranks/dimensions with an offline parser before encoding any graph-specific assumptions.
+
+**Tests:** malformed metadata, non-OK metadata response, missing output, rank mismatch, class-count mismatch, out-of-range class index, and synthetic decoder cases under the verified mapping.
+
+### AUDIT-004 — Behavioral test coverage gap
+**Files:** `tests/repository.test.mjs`, `tests/test_package_extension.py`.
+
+The current tests are useful structural and packaging checks, but do not execute the full content-script lifecycle against a synthetic DOM or prove model graph compatibility. The successful CI run must not be interpreted as proof of recognition quality.
+
+**Fix direction:** add offline, injectable behavioral tests and keep structural tests for manifest/package invariants. Use controllable promises, a local synthetic DOM, and fake observers/timers.
+
+### AUDIT-005 — Packaging
+**Files:** `scripts/package_extension.py`, `tests/test_package_extension.py`, CI workflow.
+
+The existing packager uses a fixed allowlist; rejects missing and symlinked listed assets; normalizes entry timestamps/attributes; writes an embedded checksum manifest and ZIP sidecar. Tests verify archive contents, references, hashes, and deterministic output.
+
+**Remaining improvement:** add negative-path tests for missing/symlinked allowlisted files and explicitly verify archive integrity after generation. Continue verifying the packaged manifest and exact archive allowlist.
+
+### AUDIT-006 — Documentation
+The Node test validates selected relative Markdown file paths, but does not prove that every fragment points to a real heading or that all technical claims remain accurate.
+
+**Fix direction:** include the audit/fix/verification documents in link checks, add fragment checks where slug handling is reliable, and review privacy/model/browser/license claims manually.
+
+### AUDIT-007 — Alpha-channel contract
+**Files:** `content.js`, `model/crnn.json`, `model/crnn.onnx`.
+
+The code reads the alpha component of canvas RGBA data. The repository does not provide an authoritative training/preprocessing contract. This could be correct for a transparency-based training pipeline or wrong for an opaque grayscale/color input.
+
+**Do not switch channels, add opaque-canvas fills, or introduce uniform-image rejection heuristics without model-contract evidence.** Inspect the model offline and obtain reliable training/preprocessing documentation. If that evidence cannot be found, keep this finding blocked.
+
+### AUDIT-008 — Browser compatibility
+Only a SIMD WASM binary is bundled, but the actual minimum browser version and runtime compatibility have not been independently verified in Chromium.
+
+**Fix direction:** test unpacked-extension resource resolution and runtime initialization against a local synthetic page. Document a minimum browser only after the tested runtime evidence supports it. Avoid speculative flags or `use_dynamic_url`.
+
+### AUDIT-009 — Provenance
+Third-party notices contain ONNX Runtime MIT text, while the exact bundled version and model provenance are not yet established. Complete icon/font source attribution also requires evidence.
+
+**Fix direction:** compare the runtime bundle to an official release, preserve the applicable notices, compute hashes, locate asset generation records, and obtain model training/source/license evidence. A hash proves file identity, not ownership or redistribution rights.
+
+### AUDIT-010 — Listener/timer cleanup
+**File:** `content.js`.
+
+A persistent `load` listener is added to the observed image and is not removed from the old image when observation moves to a new element. The startup observer timeout is not cleared on early disconnect. The not-ready path may also register an additional one-shot load listener.
+
+**Fix direction:** make registration and cleanup idempotent, remove listeners from replaced nodes, clear the timer on early success, and test teardown behavior with synthetic fixtures.
+
+### AUDIT-011 — Dynamic resource URLs
+Optional hardening only. Do not enable `use_dynamic_url` unless controlled Chromium testing establishes a benefit and confirms that the bundled runtime still resolves all resources.
+
+### HIST-001 — Historical identifiers
+Review history for actual credentials or sensitive data. An extension ID or local build path alone does not establish an active credential leak; do not rotate credentials or rewrite history without evidence.
+
+## 7. Privacy and security summary
+
+- The manifest is configured for the specific ERP HTTPS origin and has no declared Chrome API permissions or separate host permissions.
+- The current source populates a field and dispatches input/change events; tests check for direct form-submission patterns. Manual submission must remain.
+- Privacy documentation distinguishes local inference from network activity by the ERP site.
+- Error objects can contain technical information; redact diagnostics before sharing.
+- No active credential exposure was established by this review.
+- Redistribution/provenance rights for the bundled model and all assets are not fully established.
+
+## 8. Remediation order
+
+1. Add offline behavioral tests for lifecycle, selector priority, and cleanup.
+2. Verify model graph and preprocessing contract before changing model-dependent runtime behavior.
+3. Add missing/symlink package negative-path tests and archive-integrity validation.
+4. Extend Markdown fragment validation and cover all audit documents.
+5. Run a Chromium smoke test with a local synthetic fixture and document tested compatibility.
+6. Resolve ONNX Runtime, model, icon, and font provenance.
+
+## 9. Limitations
+
+No live ERP accounts, production CAPTCHA images, or production network endpoints were used. The ONNX graph and bundled runtime binaries were not inspected with a local parser in this session; no Chromium test was run locally. Current tests and CI do not establish recognition accuracy or model correctness.
+
+See [IMPROVEMENT_BACKLOG.md](IMPROVEMENT_BACKLOG.md), [FIX_IMPLEMENTATION_GUIDE.md](FIX_IMPLEMENTATION_GUIDE.md), [TEST_AND_VERIFICATION_PLAN.md](TEST_AND_VERIFICATION_PLAN.md), and [audit/improvement-backlog.json](audit/improvement-backlog.json).
